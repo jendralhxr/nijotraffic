@@ -14,6 +14,7 @@ int sensor1, sensor2;
 struct timeval time_current;
 char command[128];
 char kara, buffer;
+char state; // oclussion at a, b, both, or clear (1, 2, 3, 0)
 char sensor_detect[2]; // whether a vehicle is passing
 unsigned int len;
 ssize_t n;
@@ -51,9 +52,12 @@ int main(int argc, char **argv){
 		while (buffer){
 			len=read(sensor1, &kara, 1);
 			if (len==1){
-				if(kara=='E') sensor_detect[0]= 1; // detecting occlusion
+				if(kara=='E') sensor_detect[0]= 1; // detecting occlusion, can be other errors too
 				if(kara!=0xa) buffer= 2;
-				if((kara==0xa) && (buffer==2)) buffer=0; // end of line
+				if((kara==0xa) && (buffer==2)) {
+					buffer=0; // end of line
+					break;
+						}
 					}
 				}
 		
@@ -64,34 +68,45 @@ int main(int argc, char **argv){
 			if (len==1){
 				if(kara=='E') sensor_detect[1]= 1; // detecting occlusion
 				if(kara!=0xa) buffer= 2;
-				if((kara==0xa) && (buffer==2)) buffer=0; // end of line
+				if((kara==0xa) && (buffer==2)) {
+					buffer=0; // end of line
+					break;
+						}
 					}
 				}
 		
+//		printf("reading ok");
 		// compare, if either is null, write things to logfile
 		logfile= fopen(argv[3], "a");
-		if (sensor_detect[0] && sensor_detect[1]){
+		if (sensor_detect[0] && sensor_detect[1] && (state!=3)){
+			state= 3;			
 			gettimeofday(&time_current,NULL);
     		fprintf(logfile, "%ld c\n",time_current.tv_sec);
     		printf("%ld c\n",time_current.tv_sec);
 			sensor_detect[0]= 0;
 			sensor_detect[1]= 0;
 			}
-		else if (sensor_detect[0]){
+		else if (sensor_detect[0] && (state!=1)){
+			state= 1;
 			gettimeofday(&time_current,NULL);
     		fprintf(logfile, "%ld a\n",time_current.tv_sec);
 			printf("%ld a\n",time_current.tv_sec);
 			sensor_detect[0]= 0;
 			}
-		else if (sensor_detect[1]){
+		else if (sensor_detect[1] && (state!=2)){
+			state= 2;
 			gettimeofday(&time_current,NULL);
     		fprintf(logfile, "%ld b\n",time_current.tv_sec);
 			printf("%ld b\n",time_current.tv_sec);
 			sensor_detect[1]= 0;
 			}
-		else printf("traffic clear\n");	
-		sensor_detect[0]= 0;
-		sensor_detect[1]= 0;
+		else {
+			printf("traffic clear\n");	
+			sensor_detect[0]= 0;
+			sensor_detect[1]= 0;
+			state= 0;
+			}
 		fclose(logfile);
+		printf("state %d",state);
 		}
 	}
