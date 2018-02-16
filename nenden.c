@@ -12,17 +12,16 @@ int reed[POINTS];
 struct timeval timer[POINTS], time_start;
 double elapsed[POINTS];
 char command[128];
-char kara;
+char kara[4];
 ssize_t n;
 	
-/* usage:
-	nenden gpio2 gpio3 gpio17 gpio27 
+/* usage	nenden gpio2 gpio3 gpio17 gpio27 
 */
 
 int main(int argc, char **argv){
 	int i;
 	// inits
-	for (i=0; i<=9; i++){
+	/*for (i=0; i<POINTS; i++){
 		sprintf(command,"echo %s >> /sys/class/gpio/export", argv[i+1]);
 		if (system(command)==-1) exit(1);
 		sprintf(command,"echo in > /sys/class/gpio/%s/direction", argv[i+1]);
@@ -30,29 +29,37 @@ int main(int argc, char **argv){
 		sprintf(command,"echo up > /sys/class/gpio/%s/pull", argv[i+1]);
 		if (system(command)==-1) exit(1);
 		sprintf(command,"/sys/class/gpio/%s/value", argv[i+1]);
-		reed[i] = open(argv[i+1], O_RDONLY);
+		printf("opening: %s\n",command);
+		reed[i] = open(command, O_RDONLY);
 		if (reed[i]==-1) {
 			printf("failed to open %s\n", argv[i+1]);
 			exit(-1);
 			}
 		}
+*/
+		reed[0] = open("/sys/class/gpio/gpio2/value", O_RDONLY);
+		reed[1] = open("/sys/class/gpio/gpio3/value", O_RDONLY);
+		reed[2] = open("/sys/class/gpio/gpio17/value", O_RDONLY);
+		reed[3] = open("/sys/class/gpio/gpio27/value", O_RDONLY);
 
 	// sensor routine
 	while(1){
 		for (i=0; i<POINTS; i++){
-			read(reed[i], &kara, 1);
-			if(kara=='0'){
-				if (i==0) // start{
+			n= read(reed[i], kara, 2);
+			printf("read: %d %d\n",kara[0], kara[1]);
+			if(kara[0]==48){
+				if (i==0){ // start
 					gettimeofday(&time_start,NULL);
 					printf("start!\n");
 					}
 				else{
 					gettimeofday(&(timer[i]),NULL);
-					elapsed[i]= (timer[i].tv_sec - time_start.tv_sec)*1e6 + timer[i].tv_usec - time_start.tv_usec; 
-					printf("check point %d: %f mikrodetik", i, elapsed);
+					elapsed[i]= (timer[i].tv_sec - time_start.tv_sec) + (timer[i].tv_usec - time_start.tv_usec); 
+					printf("check point %d: %f detik\n", i, elapsed[i]/1e6);
 					// physics goes here
 					}
+				if (i==3) break;				
 				}
-				
 			}
-	}
+		}
+}
