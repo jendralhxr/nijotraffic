@@ -10,6 +10,7 @@
 FILE *logfile;
 int reed[POINTS];
 struct timeval timer[POINTS], time_start;
+double elapsed[POINTS];
 char command[128];
 char kara;
 ssize_t n;
@@ -47,8 +48,8 @@ int main(int argc, char **argv){
 					}
 				else{
 					gettimeofday(&(timer[i]),NULL);
-					printf("check point %d: %f mikrodetik", i, \
-						(timer[i].tv_sec - time_start.tv_sec)*1e6 + timer[i].tv_usec - time_start.tv_usec);
+					elapsed[i]= (timer[i].tv_sec - time_start.tv_sec)*1e6 + timer[i].tv_usec - time_start.tv_usec; 
+					printf("check point %d: %f mikrodetik", i, elapsed);
 					// physics goes here
 					}
 				}
