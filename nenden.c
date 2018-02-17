@@ -44,21 +44,26 @@ int main(int argc, char **argv){
 
 	// sensor routine
 	while(1){
-		for (i=0; i<POINTS; i++){
+		for (i=0; i<POINTS; i){
 			n= read(reed[i], kara, 2);
 			printf("read: %d %d\n",kara[0], kara[1]);
-			if(kara[0]==48){
+			if(kara[0]=='0'){
 				if (i==0){ // start
 					gettimeofday(&time_start,NULL);
 					printf("start!\n");
+					i++;
 					}
 				else{
 					gettimeofday(&(timer[i]),NULL);
 					elapsed[i]= (timer[i].tv_sec - time_start.tv_sec) + (timer[i].tv_usec - time_start.tv_usec); 
 					printf("check point %d: %f detik\n", i, elapsed[i]/1e6);
 					// physics goes here
+					i++;
 					}
-				if (i==3) break;				
+				if (i==POINTS-1) { // end of track, wait for new start
+					i=0; 
+					break;
+					}				
 				}
 			}
 		}
