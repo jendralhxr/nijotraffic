@@ -10,12 +10,15 @@
 FILE *logfile;
 int reed[POINTS];
 struct timeval timer[POINTS], time_start;
+struct pollfd pfd; 
 double elapsed[POINTS];
 char command[128];
 char kara[4];
 ssize_t n;
 	
 /* usage	nenden gpio2 gpio3 gpio17 gpio27 
+
+polling from https://raspberrypi.stackexchange.com/questions/44416/polling-gpio-pin-from-c-always-getting-immediate-response
 */
 
 int main(int argc, char **argv){
@@ -41,10 +44,12 @@ int main(int argc, char **argv){
 		reed[1] = open("/sys/class/gpio/gpio3/value", O_RDONLY);
 		reed[2] = open("/sys/class/gpio/gpio17/value", O_RDONLY);
 		reed[3] = open("/sys/class/gpio/gpio27/value", O_RDONLY);
-
+	
 	// sensor routine
 	while(1){
 		for (i=0; i<POINTS; i){
+			poll(&pfd, 1, -1); //
+			lseek(reed[i], 0, SEEK_SET);
 			n= read(reed[i], kara, 2);
 			printf("read: %d %d\n",kara[0], kara[1]);
 			if(kara[0]=='0'){
