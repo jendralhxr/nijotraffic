@@ -18,8 +18,8 @@ crop_x_stop= 1400
 crop_y_start= 0
 crop_y_stop= 90
 
-gate_right= 200
-gate_left= 1200
+gate_right= 1200
+gate_left= 200
 
 
 thickness_min= 10 # maximum width of bondo
@@ -94,6 +94,16 @@ while(1):
 					for n in range(block_start, block_end):
 						for j in range(crop_y_start, crop_y_stop):
 							image_cue[j,n][2] = vehicle_id
+							
+				if (block_start > gate_left) and (block_end < gate_right):
+					if (image_prev[1, int((block_start + block_end)/2) ][2] != 0) :
+						vehicle_id= image_prev[1, int((block_start + block_end)/2) ][2]
+						#print("right gate: {} {} {}".format(vehicle_id, framenum, block_end-block_start))
+					else:
+						vehicle_id= 255
+					for n in range(block_start, block_end):
+						for j in range(crop_y_start, crop_y_stop):
+							image_cue[j,n][2] = vehicle_id			
 			block_start= 0
 			block_end= 0
 			
@@ -102,8 +112,8 @@ while(1):
 
 	# draw the gate
 	for j in range(crop_y_start, crop_y_stop):
-		image_cue[j,gate_left][2] = 255 # red
-		image_cue[j,gate_right][2] = 255 # red
+		image_cue[j,gate_left][1] = 255 # red
+		image_cue[j,gate_right][1] = 255 # red
 	
 	cv2.imshow('cue',image_cue)
 	
