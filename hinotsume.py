@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import numpy as np
+import numpy
 import cv2
 import sys
 import math
@@ -28,6 +28,9 @@ block_width= 60 # minimum width of vehicle
 ret, frame= cap.read()
 image_cue= frame[crop_y_start:crop_y_stop, crop_x_start:crop_x_stop]
 image_prev= image_cue	
+
+latch_cue = numpy.empty(255, dtype=int)
+
 
 framenum= 0
 while(1):
@@ -75,12 +78,27 @@ while(1):
 				
 				# from right: red: 1 to 99
 				# from left: 101 to 200
+				# retain the value while in the middle
+				if (block_start > gate_left) and (block_end < gate_right):
+					if (image_prev[1, int((block_start + block_end)/2) ][2] != 0) :
+						vehicle_id= image_prev[1, int((block_start + block_end)/2) ][2]
+						if latch_cue[vehicle_id] == 1:
+							# check if closer to 
+							print("just exited: {} {} {}".format(vehicle_id, framenum, block_end-block_start))
+							latch_cue[vehicle_id]= 0
+					else:
+						vehicle_id= 254
+					for n in range(block_start, block_end):
+						for j in range(crop_y_start, crop_y_stop):
+							image_cue[j,n][2] = vehicle_id	
+							
 				if (block_start < gate_left) and (gate_left < block_end):
 					if (image_prev[1, int((block_start + block_end)/2) ][2] != 0) :
 						vehicle_id=  image_prev[1, int((block_start + block_end)/2) ][2]
-						print("left gate: {} {} {}".format(vehicle_id, framenum, block_end-block_start))
 					else:
 						vehicle_id= random.randint(1, 99)
+						print("left gate: {} {} {}".format(vehicle_id, framenum, block_end-block_start))
+						latch_cue[vehicle_id]= 1
 					for n in range(block_start, block_end):
 						for j in range(crop_y_start, crop_y_stop):
 							image_cue[j,n][2] = vehicle_id
@@ -88,22 +106,15 @@ while(1):
 				if (block_start < gate_right) and (gate_right < block_end):
 					if (image_prev[1, int((block_start + block_end)/2) ][2] != 0) :
 						vehicle_id= image_prev[1, int((block_start + block_end)/2) ][2]
-						print("right gate: {} {} {}".format(vehicle_id, framenum, block_end-block_start))
 					else:
 						vehicle_id= random.randint(101, 199)
+						print("right gate: {} {} {}".format(vehicle_id, framenum, block_end-block_start))
+						latch_cue[vehicle_id]= 1
 					for n in range(block_start, block_end):
 						for j in range(crop_y_start, crop_y_stop):
 							image_cue[j,n][2] = vehicle_id
 							
-				if (block_start > gate_left) and (block_end < gate_right):
-					if (image_prev[1, int((block_start + block_end)/2) ][2] != 0) :
-						vehicle_id= image_prev[1, int((block_start + block_end)/2) ][2]
-						#print("right gate: {} {} {}".format(vehicle_id, framenum, block_end-block_start))
-					else:
-						vehicle_id= 255
-					for n in range(block_start, block_end):
-						for j in range(crop_y_start, crop_y_stop):
-							image_cue[j,n][2] = vehicle_id			
+						
 			block_start= 0
 			block_end= 0
 			
