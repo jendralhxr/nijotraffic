@@ -29,7 +29,7 @@ image_cue= frame[crop_y_start:crop_y_stop, crop_x_start:crop_x_stop]
 image_prev= image_cue    
 
 
-framenum= 0
+framenum= float(sys.argv[2])
 while(1):
     ret, frame = cap.read()
     framenum+=1
@@ -73,7 +73,7 @@ while(1):
                 # from left: 101 to 200
                 # retain the value while in the middle
                 # in the middle
-                if (block_start > gate_left) and (block_end < gate_right):
+                if (block_start >= gate_left) and (block_end <= gate_right):
                     # left to right
                     vehicle_id = 0
                     if (image_prev[2,int((block_start + block_end)/2) ][2] != 0) :
@@ -107,11 +107,11 @@ while(1):
                     if (image_prev[3, int((block_start + block_end)/2) ][2] != 0) :
                         vehicle_id= image_prev[3, int((block_start + block_end)/2) ][2]
                         #if (image_prev[2, int((block_start + block_end)/2) ][2] == 0):
-                        #    print("{} {} {} {} right".format(vehicle_id, framenum, block_start, block_end))
+                        #print("{} {} {} {} rightedge".format(vehicle_id, framenum, block_start, block_end))
                     else:
                         vehicle_id= random.randint(81, 160)
                         #if (image_prev[2, int((block_start + block_end)/2) ][2] == 0):
-                        #    print("{} {} {} {} rightnew".format(vehicle_id, framenum, block_start, block_end))
+                        #print("{} {} {} {} rightnew".format(vehicle_id, framenum, block_start, block_end))
                     for n in range(block_start, block_end):
                         image_cue[3,n][2] = vehicle_id
                             
@@ -120,12 +120,12 @@ while(1):
     
     image_prev= image_cue;
 
-    # draw the gate
-    #for j in range(crop_y_start, crop_y_stop):
+    #draw the gate
+    #or j in range(crop_y_start, crop_y_stop):
     #    image_cue[j,gate_left][1] = 255 # red
     #    image_cue[j,gate_right][1] = 255 # red
-    
-    #cv2.imshow('cue',image_cue)
+    #    cv2.imshow('cue',image_cue)
+    #print(framenum)
     #k = cv2.waitKey(1)    
     #if k == 27:
     #    break
