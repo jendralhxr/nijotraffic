@@ -21,7 +21,7 @@ for i=2:size(raw,1)
     traffic(n,4)= mean(raw(start:stop, COL_WIDTH));
     traffic(n,5)= raw(stop, COL_FRAMENUM) - raw(start, COL_FRAMENUM);
     traffic(n,6)= raw(start, COL_POSITION);
-  #traffic(n,7)= stop;
+    traffic(n,7)= raw(stop, COL_POSITION);
     start=i;
   n+=1;
   end
