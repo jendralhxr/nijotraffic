@@ -14,7 +14,7 @@ frame = cap.read()
 threshold_min= 20
 
 crop_x_start= 0
-crop_x_stop= 1400
+crop_x_stop= 900
 crop_y_start= 0
 crop_y_stop= 90
 

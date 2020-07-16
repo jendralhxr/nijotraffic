@@ -1,4 +1,5 @@
 raw=dlmread("summary.txt","\t,");
+
 COL_ID        =1;
 COL_FRAMENUM  =2;
 COL_START      =3;
@@ -7,6 +8,16 @@ COL_DIRECTION   =5;
 COL_WIDTH      =6;
 COL_POSITION    =7;
 
+for i=1:size(new0,1)
+  new0(i, COL_WIDTH)= new0(i, COL_STOP) - new0(i, COL_START);
+  new0(i, COL_POSITION)= (new0(i, COL_STOP) + new0(i, COL_START)) /2;
+endfor
+
+for i=1:size(new1,1)
+  new1(i, COL_WIDTH)= new1(i, COL_STOP) - new1(i, COL_START);
+  new1(i, COL_POSITION)= (new1(i, COL_STOP) + new1(i, COL_START)) /2;
+endfor
+  
 MAX_PASS= 2000.0;
 
 clear traffic;
