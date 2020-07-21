@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
+
+# todo:
+# remove spurious thin line of noise
+# draw the bounding box
+# output the video
+# single pixel horizontal shadow instead of block highlight (done)
+
+# python3 -u track.py flag0.mp4 0 | tee log0.txt
+# python3 -u track.py flag1.mp4 0 | tee log1.txt
+
 import numpy
 import cv2
 import sys
 import math
 import random
-# todo: single pixel horizontal shadow instead of block highlight
 
 print(sys.argv[1])
 cap = cv2.VideoCapture(sys.argv[1])
 cap.set(cv2.CAP_PROP_POS_FRAMES, float(sys.argv[2]))
 frame = cap.read()
 
-threshold_min= 20
+threshold_min= 40
 
 crop_x_start= 0
 crop_x_stop= 900
