@@ -23,7 +23,7 @@ crop_y_stop= stopy -starty
 
 cap = cv2.VideoCapture(sys.argv[1])
 ref= cv2.imread(sys.argv[2])
-vsize = (int(1504), int(96))
+vsize = (int(1504), int(80))
 
 thickness_min= 10 # maximum width of bondo
 block_width= 60 # minimum width of vehicle
