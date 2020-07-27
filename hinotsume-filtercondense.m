@@ -1,4 +1,5 @@
-raw=dlmread("summary.txt","\t,");
+log1=dlmread("label1.log","\t, ");
+log0=dlmread("label0.log","\t, ");
 
 COL_ID        =1;
 COL_FRAMENUM  =2;
@@ -7,6 +8,10 @@ COL_STOP     =4;
 COL_DIRECTION   =5;
 COL_WIDTH      =6;
 COL_POSITION    =7;
+
+new0= sortrows(log0, [1 2]);
+new1= sortrows(log1, [1 2]);
+
 
 for i=1:size(new0,1)
   new0(i, COL_WIDTH)= new0(i, COL_STOP) - new0(i, COL_START);
@@ -20,6 +25,7 @@ endfor
   
 MAX_PASS= 2000.0;
 
+raw=new1;
 clear traffic;
 start= 1;
 n=1;
@@ -37,4 +43,6 @@ for i=2:size(raw,1)
   n+=1;
   end
 endfor
-save traffic-summary.csv traffic
+
+traffic=sortrows(traffic, [2]); # sort from framenum/time of occurence
+save traffic1.csv traffic
