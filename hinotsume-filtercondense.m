@@ -5,13 +5,12 @@ COL_ID        =1;
 COL_FRAMENUM  =2;
 COL_START      =3;
 COL_STOP     =4;
-COL_DIRECTION   =5;
+COL_DIRECTION   =5; # right is 0, left is 1
 COL_WIDTH      =6;
 COL_POSITION    =7;
 
 new0= sortrows(log0, [1 2]);
 new1= sortrows(log1, [1 2]);
-
 
 for i=1:size(new0,1)
   new0(i, COL_WIDTH)= new0(i, COL_STOP) - new0(i, COL_START);
@@ -45,4 +44,14 @@ for i=2:size(raw,1)
 endfor
 
 traffic=sortrows(traffic, [2]); # sort from framenum/time of occurence
+
+for n=1:size(traffic,1)
+    if traffic(n,3)==1 && traffic(n,7)<traffic(n,6)
+        traffic(n,:) = [];
+	endif
+	if traffic(n,3)==0 && traffic(n,7)>traffic(n,6) 
+        traffic(n,:) = [];
+	endif
+endfor
+
 save traffic1.csv traffic
