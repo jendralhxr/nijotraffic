@@ -45,6 +45,7 @@ endfor
 
 traffic=sortrows(traffic, [2]); # sort from framenum/time of occurence
 
+# filter the wrong-direction output (opposite-end detection)
 for n=1:size(traffic,1)
     if traffic(n,3)==1 && traffic(n,7)<traffic(n,6)
         traffic(n,:) = [];
