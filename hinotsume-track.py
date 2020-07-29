@@ -131,9 +131,13 @@ while(1):
 				else:
 				#if (block_start >= gate_left) and (block_end <= gate_right):
 					# left to right
-					vehicle_id = image_prev.item(3,int((block_start + block_end)/2) ,2)
+					vehicle_id = 0
+					for n in range(block_start, block_end, 2):
+						vehicle_id = image_prev.item(3, n, 2)
+						if (vehicle_id != 0):
+							break
 					if ( vehicle_id != 0) :
-						#print("{} {} {} {} 1".format(vehicle_id, framenum, block_start, block_end)) # left is '1'
+						print("{} {} {} {} 1".format(vehicle_id, framenum, block_start, block_end)) # left is '1'
 						start_point = (block_start, 8) 
 						end_point = (block_end, 72) 
 						label_point= (block_start+10, 30)
@@ -142,9 +146,12 @@ while(1):
 						for n in range(block_start, block_end):
 							image_cue.itemset((3,n,2),  vehicle_id)
 					# right to left
-					vehicle_id = image_prev.item(5, int((block_start + block_end)/2) ,2)
+					for n in range(block_end, block_start, -2):
+						vehicle_id = image_prev.item(5, n, 2)
+						if (vehicle_id != 0):
+							break
 					if ( vehicle_id != 0) :
-						#print("{} {} {} {} 0".format(vehicle_id, framenum, block_start, block_end)) # right is '0'
+						print("{} {} {} {} 0".format(vehicle_id, framenum, block_start, block_end)) # right is '0'
 						start_point = (block_start, 8) 
 						end_point = (block_end, 72) 
 						label_point= (block_start+10, 65)
@@ -167,18 +174,18 @@ while(1):
 		image_display.itemset((j,gate_left,1) , 255) # green
 		image_display.itemset((j,gate_right,1) , 255) # green
 	
-	cv2.imshow('display',image_display)
-	cv2.imshow('cue',image_cue)
+	#cv2.imshow('display',image_display)
+	#cv2.imshow('cue',image_cue)
 	
-	k = cv2.waitKey(1) & 0xFF
+	#k = cv2.waitKey(1) & 0xFF
 	#if k== ord("c"):
 	#	print("snap reference")
 	#	cv2.imwrite("ref.png", cropped)
-	if k== 27: # esc
-		break
+	#if k== 27: # esc
+	#	break
 	
-	#out.write(image_display)
-	#out2.write(image_cue)
+	out.write(image_display)
+	out2.write(image_cue)
 	
 	#dateTimeObj = datetime.now()
 	#timestampStr = dateTimeObj.strftime("%H:%M:%S.%f")
