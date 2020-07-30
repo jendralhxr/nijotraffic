@@ -1,5 +1,8 @@
-log1=dlmread("label1.log","\t, ");
-log0=dlmread("label0.log","\t, ");
+log0=dlmread("log0.txt","\t, ");
+log1=dlmread("log1.txt","\t, ");
+
+# video0 is 82381 frames
+# video1 is 82494 frames
 
 COL_ID        =1;
 COL_FRAMENUM  =2;
@@ -22,7 +25,7 @@ for i=1:size(new1,1)
   new1(i, COL_POSITION)= (new1(i, COL_STOP) + new1(i, COL_START)) /2;
 endfor
   
-MAX_PASS= 2000.0;
+MAX_PASS= 3000.0;
 
 raw=new1;
 clear traffic;
@@ -43,16 +46,23 @@ for i=2:size(raw,1)
   end
 endfor
 
-traffic=sortrows(traffic, [2]); # sort from framenum/time of occurence
+# sort from framenum/time of occurence
+traffic=sortrows(traffic, [2]); 
 
-# filter the wrong-direction output (opposite-end detection)
-for n=1:size(traffic,1)
-    if traffic(n,3)==1 && traffic(n,7)<traffic(n,6)
-        traffic(n,:) = [];
-	endif
-	if traffic(n,3)==0 && traffic(n,7)>traffic(n,6) 
-        traffic(n,:) = [];
-	endif
-endfor
-
-save traffic1.csv traffic
+do
+    # filter the wrong-direction output (opposite-end detection)
+    size_prev= size(traffic,1);    
+        for n=1:size(traffic,1)-1
+            if traffic(n,3)==1 && traffic(n,7)<traffic(n,6)
+                traffic(n,:) = [];
+            endif
+            if traffic(n,3)==0 && traffic(n,7)>traffic(n,6) 
+                traffic(n,:) = [];
+			if traffic(n,5)<10
+                traffic(n,:) = [];	
+            endif
+        endfor
+    size_cur= size(traffic,1);
+until (size_cur==size_prev)
+    
+traffic1=traffic;
