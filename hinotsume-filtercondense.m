@@ -22,24 +22,36 @@ POS_JUMP= 20;
 clear traffic;
 start= 1;
 n=1;
+pos_max= 0;
+pos_min= 1000;
 for i=2:size(raw,1)
   if (raw(start,COL_ID) != raw(i,COL_ID)) || (raw(start,COL_DIRECTION) != raw(i,COL_DIRECTION)) ||  (( abs (raw(i,COL_FRAMENUM) - raw(i-1,COL_FRAMENUM))) > POS_JUMP )
     stop= i-1;
+    
     traffic(n,1)= raw(start, COL_ID);
     traffic(n,2)= raw(start, COL_FRAMENUM);
     traffic(n,3)= raw(stop, COL_FRAMENUM) - raw(start, COL_FRAMENUM);
     traffic(n,4)= raw(start, COL_DIRECTION);
     traffic(n,5)= mean(raw(start:stop, COL_WIDTH));
-    traffic(n,6)= raw(start, COL_POSITION);
-    traffic(n,7)= raw(stop, COL_POSITION);
+    traffic(n,6)= pos_max;
+    traffic(n,7)= pos_min;
+    
     start=i;
+    pos_max= 0;
+    pos_min= 1000;
+    
   n+=1;
   endif
+  if ( raw(i, COL_POSITION) < pos_min)
+	pos_min= raw(i, COL_POSITION);
+  endif
+  if ( raw(i, COL_POSITION) > pos_max)
+	pos_max= raw(i, COL_POSITION);
+  endif
 endfor
-
-
 # sort from framenum/time of occurence
 traffic=sortrows(traffic, [2]); 
+save trafficnofilter.txt traffic
 
 # filter the wrong-direction output (opposite-end detection)
 do
@@ -58,6 +70,8 @@ do
   size_cur= size(traffic,1);
 until (size_cur==size_prev)
 
+save logsorted.txt raw
+save traffic.txt traffic
     
 #---------
 
