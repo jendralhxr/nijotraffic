@@ -66,3 +66,25 @@ do
 until (size_cur==size_prev)
     
 traffic1=traffic;
+
+#---------
+
+traffic=dlmread("ba.txt","\t");
+TIME_CLUSTER= 3 # mins
+
+traffic(:, COL_FRAMENUM) /= 3600; # now in minutes
+COL_DIRECTION=3;
+
+#count per direction
+clear sum_count;
+sum_count(2, ceil(max(traffic(:,COL_FRAMENUM)) / TIME_CLUSTER))=1;
+for i=1:size(traffic,1)
+	if ( traffic(i, COL_DIRECTION) < 1)
+	    sum_count(1, ceil(traffic(i,COL_FRAMENUM)/TIME_CLUSTER) ) += 1;
+	else
+	    sum_count(2, ceil(traffic(i,COL_FRAMENUM)/TIME_CLUSTER) ) += 1;
+	endif
+endfor
+
+timestamp= 0:TIME_CLUSTER:max(traffic(:,COL_FRAMENUM));
+plot(timestamp, sum_count);
