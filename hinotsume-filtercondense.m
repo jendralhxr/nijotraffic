@@ -73,7 +73,7 @@ save traffic.txt traffic
 TIME_CLUSTER= 3 # mins
 
 traffic(:, COL_FRAMENUM) /= 3600; # now in minutes
-COL_DIRECTION=3;
+COL_DIRECTION=4;
 
 #count per direction
 clear sum_direction;

@@ -187,9 +187,9 @@ while(1):
 	out.write(image_display)
 	out2.write(image_cue)
 	
-	#dateTimeObj = datetime.now()
-	#timestampStr = dateTimeObj.strftime("%H:%M:%S.%f")
-	#print('display: ', timestampStr)
+	dateTimeObj = datetime.now()
+	timestampStr = dateTimeObj.strftime("%H:%M:%S.%f")
+	print('time: ', timestampStr)
 	
 	#print(framenum)
 	framenum += 1
