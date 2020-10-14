@@ -29,14 +29,27 @@ cur= traffic(i, fstart);
   endfor
 endfor
 
+
+displacement=dlmread("mangap.txt","\t");
 # in sec
-offset=-83*60;
-pstart=120760;
-pstop =123760;
+offset=0;
+pstart=420*60;
+pstop =430*60;
 plot(time(pstart:pstop), pass_length(pstart:pstop,:));
 
 subplot(2,1,1)
 plot(time(pstart:pstop), pass_length(pstart:pstop,:));
+ylabel("vehicle length (m)")
 subplot(2,1,2)
 plot(time(pstart:pstop), displacement(pstart+offset:pstop+offset,:));
+ylabel("vertical displacement (mm)")
+xlabel("time (s)");
+#---------
 
+sample=dlmread("kucel.txt","\t");
+for i=1:size(sample,1)
+  upsample(2*i-1,:)= sample(i,:); 
+  upsample(2*i,:)  = (sample(i,:) + sample(i+1,:)) /2;
+endfor
+upsample(size(upsample,1)+1,:)= mean(sample(size(sample,1)-3:size(sample,1),:)) ;
+save "kucel-ups.txt" "upsample";
