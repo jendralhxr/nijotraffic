@@ -9,14 +9,57 @@ COL_DIRECTION   =5; # right is 0, left is 1
 COL_WIDTH      =6;
 COL_POSITION    =7;
 
-raw=dlmread("logall.txt","\t, ");
-raw= sortrows(raw, [1 2]);
+load logsorted.txt
 
+#calculate the width and center position of vehicle
 for i=1:size(raw,1)
   raw(i, COL_WIDTH)= raw(i, COL_STOP) - raw(i, COL_START);
   raw(i, COL_POSITION)= (raw(i, COL_STOP) + raw(i, COL_START)) /2;
 endfor
 
+# remove entries from overlapping lane detection 
+# repeat until clear
+raw= sortrows(raw, [2 1]);
+for i=1:size(raw,1)
+ if  (raw(i,COL_FRAMENUM)== raw(i+1,COL_FRAMENUM)) &&  (raw(i,COL_START) 	== raw(i+1,COL_START)) && (raw(i,COL_STOP)== raw(i+1,COL_STOP))
+ raw(i:i+1,:)=[];
+ endif
+endfor
+
+#remove the width of padding (in px)
+raw(:,COL_WIDTH) -= 10; 
+
+#--------- filter post-overlap passes
+i=1;
+#while i<2030
+while i<size(raw,1)
+  if (raw(i, COL_FRAMENUM) == raw(i+1, COL_FRAMENUM)) && (raw(i, COL_ID) == raw(i+1, COL_ID))
+    j=1;
+	while j<360
+	   if raw(i, COL_FRAMENUM) != raw(i+j, COL_FRAMENUM)
+	     break
+	     else j+=1;
+	   endif
+	endwhile
+	fprintf(sfile,"ID %d: %dx duplicate at %d-------%d %d\n", raw(i, COL_ID), j, raw
+
+# for each segement with the same frame number, find the position of that particular ID from previous segment (increment track back)
+# discard the frame based 
+# iterate in one increment
+
+	(i, COL_FRAMENUM), i, j);
+	i+=j;
+  else i+=1;
+  endif
+endwhile
+
+
+
+
+
+
+#----- calculating traffic passes 
+raw= sortrows(raw, [1 2]);
 POS_JUMP= 20;
 
 clear traffic;
@@ -50,11 +93,12 @@ for i=2:size(raw,1)
 	pos_max= raw(i, COL_POSITION);
   endif
 endfor
+
 # sort from framenum/time of occurence
 traffic=sortrows(traffic, [2]); 
-save trafficnofilter.txt traffic
 
 # filter the wrong-direction output (opposite-end detection)
+# repeat until clear
 do
   size_prev= size(traffic,1);    
   for n=1:size(traffic,1)-1
@@ -66,7 +110,7 @@ do
 until (size_cur==size_prev)
 
 save logsorted.txt raw
-save traffic.txt traffic
+save trafficwidthcorrected.txt traffic
     
 #---------
 
