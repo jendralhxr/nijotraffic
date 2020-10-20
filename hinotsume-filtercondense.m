@@ -21,7 +21,7 @@ endfor
 # repeat until clear
 raw= sortrows(raw, [2 1]);
 for i=1:size(raw,1)
- if  (raw(i,COL_FRAMENUM)== raw(i+1,COL_FRAMENUM)) &&  (raw(i,COL_START) 	== raw(i+1,COL_START)) && (raw(i,COL_STOP)== raw(i+1,COL_STOP))
+ if  (raw(i,COL_FRAMENUM)== raw(i+1,COL_FRAMENUM)) &&  (raw(i,COL_START)   == raw(i+1,COL_START)) && (raw(i,COL_STOP)== raw(i+1,COL_STOP))
  raw(i:i+1,:)=[];
  endif
 endfor
@@ -36,26 +36,38 @@ raw(:,COL_WIDTH) -= 10;
 # iterate in one increment
 
 i=1;
-#while i<2030
 while i<size(raw,1)
   if (raw(i, COL_FRAMENUM) == raw(i+1, COL_FRAMENUM)) && (raw(i, COL_ID) == raw(i+1, COL_ID))
-    j=1;
-	while j<10
-	if ((raw(i-j, COL_FRAMENUM) == raw(i, COL_FRAMENUM)-1) && (raw(i-j, COL_ID) == raw(i, COL_ID)))
-	  if (raw(i-j, COL_ID) < 100) && (raw(i, COL_POSITION) < raw(i-j, COL_POSITION))
-	    raw(i,:)= [];
-	  endif
-	  if (raw(i-j, COL_ID) > 100) && (raw(i, COL_POSITION) > raw(i-j, COL_POSITION))
-	    raw(i,:)= [];
-	  endif
-	endif
-	else
-	j+=1;
-	endwhile
+   
+  # find the prev position
+  fin=1;
+  for j=1:20
+      if ((raw(i-j, COL_ID) == raw(i, COL_ID)))
+      printf("dup %d %d/%d %d-%d\n", raw(i, COL_ID), raw(i, COL_POSITION), raw(i-j, COL_POSITION), i, j);
+      # found the duplicate
+        if (raw(i, COL_ID) < 100) && (raw(i, COL_POSITION) < raw(i-j, COL_POSITION))
+          raw(i,:)= [];
+          fin=0;
+        endif
+        if (raw(i, COL_ID) > 100) && (raw(i, COL_POSITION) > raw(i-j, COL_POSITION))
+          raw(i,:)= [];
+          fin=0;
+        endif
+      break
+    endif
+  endfor
+  
+  if fin==1 
+    i+=1;  
+  endif
+  
   else
   i+=1;
   endif
+
 endwhile
+
+
 
 
 #----- calculating traffic passes 
@@ -76,7 +88,7 @@ for i=2:size(raw,1)
     traffic(n,3)= raw(stop, COL_FRAMENUM) - raw(start, COL_FRAMENUM);
     traffic(n,4)= raw(start, COL_DIRECTION);
     traffic(n,5)= mean(raw(start:stop, COL_WIDTH));
-	traffic(n,6)= raw(start, COL_POSITION);
+  traffic(n,6)= raw(start, COL_POSITION);
     traffic(n,7)= pos_max;
     traffic(n,8)= pos_min;
     
@@ -87,10 +99,10 @@ for i=2:size(raw,1)
   n+=1;
   endif
   if ( raw(i, COL_POSITION) < pos_min)
-	pos_min= raw(i, COL_POSITION);
+  pos_min= raw(i, COL_POSITION);
   endif
   if ( raw(i, COL_POSITION) > pos_max)
-	pos_max= raw(i, COL_POSITION);
+  pos_max= raw(i, COL_POSITION);
   endif
 endfor
 
@@ -104,7 +116,7 @@ do
   for n=1:size(traffic,1)-1
     if traffic(n,3)<10
       traffic(n,:) = [];  
-	endif
+  endif
   endfor
   size_cur= size(traffic,1);
 until (size_cur==size_prev)
