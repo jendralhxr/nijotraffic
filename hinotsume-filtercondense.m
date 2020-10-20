@@ -30,32 +30,32 @@ endfor
 raw(:,COL_WIDTH) -= 10; 
 
 #--------- filter post-overlap passes
+# for each segement with the same frame number, find the position of that particular ID 
+# from previous segment (increment track back)
+# discard the frame based 
+# iterate in one increment
+
 i=1;
 #while i<2030
 while i<size(raw,1)
   if (raw(i, COL_FRAMENUM) == raw(i+1, COL_FRAMENUM)) && (raw(i, COL_ID) == raw(i+1, COL_ID))
     j=1;
-	while j<360
-	   if raw(i, COL_FRAMENUM) != raw(i+j, COL_FRAMENUM)
-	     break
-	     else j+=1;
-	   endif
+	while j<10
+	if ((raw(i-j, COL_FRAMENUM) == raw(i, COL_FRAMENUM)-1) && (raw(i-j, COL_ID) == raw(i, COL_ID)))
+	  if (raw(i-j, COL_ID) < 100) && (raw(i, COL_POSITION) < raw(i-j, COL_POSITION))
+	    raw(i,:)= [];
+	  endif
+	  if (raw(i-j, COL_ID) > 100) && (raw(i, COL_POSITION) > raw(i-j, COL_POSITION))
+	    raw(i,:)= [];
+	  endif
+	endif
+	else
+	j+=1;
 	endwhile
-	fprintf(sfile,"ID %d: %dx duplicate at %d-------%d %d\n", raw(i, COL_ID), j, raw
-
-# for each segement with the same frame number, find the position of that particular ID from previous segment (increment track back)
-# discard the frame based 
-# iterate in one increment
-
-	(i, COL_FRAMENUM), i, j);
-	i+=j;
-  else i+=1;
+  else
+  i+=1;
   endif
 endwhile
-
-
-
-
 
 
 #----- calculating traffic passes 
